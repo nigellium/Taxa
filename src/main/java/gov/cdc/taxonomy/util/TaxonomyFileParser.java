@@ -69,8 +69,8 @@ public class TaxonomyFileParser {
 			}
 		});
 
-		String strNode = createNodeEntry(listNdId.get(0), parentId, rank);
-		String strName = createNameEntry(listNdId.get(0), label);
+		String strNode = createNodeEntry(listNdId.get(0) + 1, parentId, rank);
+		String strName = createNameEntry(listNdId.get(0) + 1, label);
 
 		Files.write(Paths.get(files[0].getAbsolutePath()), strNode.getBytes(), StandardOpenOption.APPEND);
 
@@ -84,7 +84,7 @@ public class TaxonomyFileParser {
 	}
 
 	private static String createNodeEntry(Integer ndId, String parentId, String rank) {
-		return ndId + "|" + parentId + "|" + rank + "||||\\r\\n";
+		return ndId + "|" + parentId + "|" + rank + "|||||||||||\r\n";
 	}
 
 }
