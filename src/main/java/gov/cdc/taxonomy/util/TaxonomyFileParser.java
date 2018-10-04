@@ -63,6 +63,7 @@ public class TaxonomyFileParser {
 			if (taxId > ndId) {
 				ndId = taxId;
 			}
+			listNdId.add(0, ndId);
 		});
 		
 		String strNode = createNodeEntry (listNdId.get(0), parentId, rank);
