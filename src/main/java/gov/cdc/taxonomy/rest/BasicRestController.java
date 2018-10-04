@@ -29,8 +29,8 @@ import gov.cdc.taxonomy.util.TaxonomyFileParser;
 @RequestMapping("/")
 public class BasicRestController {
 
-	//@Autowired
-	//RestTemplate restTemplate;
+	@Autowired
+	RestTemplate restTemplate;
 	@RequestMapping("/")
 	  public String home() {
 	    return "index.html";
@@ -39,7 +39,7 @@ public class BasicRestController {
 	  public String add() {
 	    return "add.html";
 	  }
-	@RequestMapping(value = "/query", method = RequestMethod.POST)
+	@RequestMapping(value = "/query", method = RequestMethod.POST,produces = { "application/json" })
 	
 	  @ResponseBody
 	  public TaxonomyNode selectTaxonomy(@RequestParam("nodeFile") MultipartFile nodeFile,@RequestParam("nameFile") MultipartFile nameFile, @RequestParam("term")String term) {
