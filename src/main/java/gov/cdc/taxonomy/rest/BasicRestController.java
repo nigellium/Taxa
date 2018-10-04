@@ -4,6 +4,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -25,7 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 import gov.cdc.taxonomy.model.TaxonomyNode;
 import gov.cdc.taxonomy.util.TaxonomyFileParser;
 
-@RestController
+@Controller
 @RequestMapping("/")
 public class BasicRestController {
 
@@ -51,7 +53,7 @@ public class BasicRestController {
                         new BufferedOutputStream(new FileOutputStream(new File(nodeFile.getName() + "-uploaded")));
                 stream.write(bytes);
                 stream.close();*/
-            	File [] files = new File[] {new File(nodeFile.getOriginalFilename()), new File(nameFile.getOriginalFilename())};
+            	File [] files = new File[] {multipartToFile(nodeFile), multipartToFile(nameFile)};
             	node = TaxonomyFileParser.parse(files, term);
              
             } catch (Exception e) {
@@ -61,7 +63,7 @@ public class BasicRestController {
 		 return  node;
 	  }
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
-	public ResponseEntity<?> generateZip(@RequestParam("nodeFile") MultipartFile nodeFile,@RequestParam("nameFile") MultipartFile nameFile, @RequestParam("term")String term) throws IOException {
+	public ResponseEntity<?> generateZip(@RequestParam("nodeFile") MultipartFile nodeFile,@RequestParam("nameFile") MultipartFile nameFile, @RequestParam("term")String term,  @RequestParam("rank")String rank,  @RequestParam("label")String label) throws IOException {
 		 HttpHeaders headers = new HttpHeaders();
 	        headers.setContentType(MediaType.parseMediaType("application/zip"));
 	        String outputFilename = "output.zip";
@@ -70,8 +72,8 @@ public class BasicRestController {
 
 	        ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
 	        ZipOutputStream zipOutputStream = new ZipOutputStream(byteOutputStream);
-	        File [] files = new File[] {new File(nodeFile.getOriginalFilename()), new File(nameFile.getOriginalFilename())};
-        	
+	        File [] files = new File[] {multipartToFile(nodeFile), multipartToFile(nameFile)};
+        	TaxonomyFileParser.addNode(files, term, rank, label);
 
 	        for(File file: files) {
 	            zipOutputStream.putNextEntry(new ZipEntry(file.getName()));           
@@ -82,6 +84,17 @@ public class BasicRestController {
 	        }           
 	        zipOutputStream.close();
 	    return new ResponseEntity<>(byteOutputStream.toByteArray(), headers, HttpStatus.OK); 
+	}
+	
+	public File multipartToFile(MultipartFile multipart) throws IllegalStateException, IOException 
+	{
+	    File convFile = new File( multipart.getOriginalFilename());
+	    File newFile = new File(convFile.getName());
+	   if(newFile.exists()) {
+		   newFile.delete();
+	   }
+	    Files.copy(Paths.get(convFile.getAbsolutePath()), Paths.get(newFile.getAbsolutePath()));
+	    return newFile;
 	}
 
 }
