@@ -1,14 +1,17 @@
 package gov.cdc.taxonomy.rest;
 
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -88,12 +91,18 @@ public class BasicRestController {
 	
 	public File multipartToFile(MultipartFile multipart) throws IllegalStateException, IOException 
 	{
-	    File convFile = new File( multipart.getOriginalFilename());
-	    File newFile = new File("data/"+ convFile.getName());
+	    String name = multipart.getOriginalFilename().substring(multipart.getOriginalFilename().lastIndexOf("\\")+1);
+	    File newFile = new File("data/"+name);
+	    byte[] bytes = multipart.getBytes();
+        BufferedOutputStream stream = 
+                new BufferedOutputStream(new FileOutputStream(newFile));
+        stream.write(bytes);
+        stream.close();
+	 /*  File newFile = new File("data/"+ convFile.getName());
 	   if(newFile.exists()) {
 		   newFile.delete();
 	   }
-	    Files.copy(Paths.get(convFile.getAbsolutePath()), Paths.get(newFile.getAbsolutePath()));
+	    Files.copy(Paths.get(convFile.getAbsolutePath()), Paths.get(newFile.getAbsolutePath()));*/
 	    return newFile;
 	}
 
