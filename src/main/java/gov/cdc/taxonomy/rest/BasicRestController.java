@@ -89,7 +89,7 @@ public class BasicRestController {
 	public File multipartToFile(MultipartFile multipart) throws IllegalStateException, IOException 
 	{
 	    File convFile = new File( multipart.getOriginalFilename());
-	    File newFile = new File(convFile.getName());
+	    File newFile = new File("data/"+ convFile.getName());
 	   if(newFile.exists()) {
 		   newFile.delete();
 	   }
