@@ -3,7 +3,7 @@ package gov.cdc.taxonomy.model;
 import java.io.Serializable;
 import java.util.List;
 
-public class TaxonomyNode  implements Serializable {
+public class TaxonomyNode implements Serializable {
 	
 	private List<ChildTaxonomyNode> children;
 	

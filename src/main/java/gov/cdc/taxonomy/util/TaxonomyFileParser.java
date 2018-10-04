@@ -1,4 +1,3 @@
-
 package gov.cdc.taxonomy.util;
 
 import java.io.File;
