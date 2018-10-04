@@ -1,12 +1,9 @@
 package gov.cdc.taxonomy.rest;
 
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -17,20 +14,23 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import gov.cdc.taxonomy.model.TaxonomyNode;
 import gov.cdc.taxonomy.util.TaxonomyFileParser;
 
-@Controller
+@RestController
 @RequestMapping("/")
 public class BasicRestController {
 
+	//@Autowired
+	//RestTemplate restTemplate;
 	@RequestMapping("/")
 	  public String home() {
 	    return "index.html";
@@ -42,7 +42,8 @@ public class BasicRestController {
 	@RequestMapping(value = "/query", method = RequestMethod.POST)
 	
 	  @ResponseBody
-	  public String selectTaxonomy(@RequestParam("nodeFile") MultipartFile nodeFile,@RequestParam("nameFile") MultipartFile nameFile, @RequestParam("term")String term) {
+	  public TaxonomyNode selectTaxonomy(@RequestParam("nodeFile") MultipartFile nodeFile,@RequestParam("nameFile") MultipartFile nameFile, @RequestParam("term")String term) {
+		TaxonomyNode node = null;
 		if (!nodeFile.isEmpty() && !nameFile.isEmpty()) {
             try {
                /* byte[] bytes = nodeFile.getBytes();
@@ -51,15 +52,13 @@ public class BasicRestController {
                 stream.write(bytes);
                 stream.close();*/
             	File [] files = new File[] {new File(nodeFile.getOriginalFilename()), new File(nameFile.getOriginalFilename())};
-            	TaxonomyNode node = TaxonomyFileParser.parse(files, term);
-                return "You successfully uploaded " ;
+            	node = TaxonomyFileParser.parse(files, term);
+             
             } catch (Exception e) {
-                return "You failed to upload => " + e.getMessage();
+               e.printStackTrace();
             }
-        } else {
-            return "You failed to upload  because the file was empty.";
-        }
-	    //return "Hello World";
+        } 
+		 return  node;
 	  }
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	public ResponseEntity<?> generateZip(@RequestParam("nodeFile") MultipartFile nodeFile,@RequestParam("nameFile") MultipartFile nameFile, @RequestParam("term")String term) throws IOException {
